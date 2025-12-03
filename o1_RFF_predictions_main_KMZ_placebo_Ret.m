@@ -16,7 +16,7 @@ end
 % PRINT START TIME
 disp(datetime('now'))
 % NUMBER OF WORKERS. Set OUTSIDE OF LOOP  % delete(myCluster.Jobs)
-% start_parpool_with
+start_parpool_with
 
 % --------------------------------------------------------------------------------------------------
 % FIX THE Y PLACEBO DATA SEED FOR ALL SIMULATIONS AT ONE VALUE. 
@@ -24,7 +24,7 @@ disp(datetime('now'))
 % NUMBER OF SIMULATIONS: default is 1e3;
 nSim = 1e3;
 % Use value larger than 1000, so not to overlap with w weights RNDs 1:1000.
-placebo_seed = nSim + 1;
+placebo_seed = 1000 + 1;
 
 %**************************************************************************
 % OUTPUT DIRECTORY NAME
