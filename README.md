@@ -11,7 +11,7 @@ Run the code in order:
 2) o2_ &rarr; combines the RFF output and creates portfolio measures
 3) o3_ &rarr; plots the results
 
-- the file `Y_placebo_seed_[].mat` contains the simulated/fake Y returns data.
+- the file `Y_placebo_seed_****.mat` contains the simulated/fake Y returns data based on seed `****`.
 
 - the main function files are in the directory: `local.functions`. 
 
@@ -19,5 +19,3 @@ Run the code in order:
 
 - `KMZ_GW_benchmark_function_placebo_Ret.m`
 - `KMZ_tryrff_v2_function_for_each_sim_placebo_Ret.m`
-
-
