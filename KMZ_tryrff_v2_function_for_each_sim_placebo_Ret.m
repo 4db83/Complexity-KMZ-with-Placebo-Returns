@@ -100,19 +100,33 @@ X       = X';
 Y       = Y';
 d       = size(X,1);
 
+
 % --------------------------------------------------------------------------------------------------
 % COMPUTE MEAN AND STD OF REAL Y RETURN SERIES
 mu_Y  = mean(Y);      % 0.156348682245542
 std_Y = std(Y);       % 1.090807256888175
 % USE SAME FAKE Y = RETURN DATA 
-rng(placebo_seed) % fix seed, pass as input into function
+rng(placebo_seed) % fix seed, pass as input into function. NOTE: in parfor loop, rng(:) fixes at different init.value
+% --------------------------------------------------------------------------------------------------
+% it's faster to generate new series based on fixed seed than to load everytime. 
+% --------------------------------------------------------------------------------------------------
 Y = mu_Y + std_Y*randn(1,T);
+% save on iSim == 1 to keep for use in GW regressions
 if iSim == 1
   save( strcat('Y_placebo_seed_',num2str(placebo_seed)) ,'Y','placebo_seed', 'mu_Y', 'std_Y');
 end 
 % UNCOMMENT TO PRINT TO SCREEN TO CHECK
 % disp([mu_Y std_Y]); sep; head(Y');sep('=')
 % --------------------------------------------------------------------------------------------------
+
+% % % **************************************************************************************************
+% % % LOAD THE PLACEBO_RET DATA FROM Y_PLACEBO_SEED_1001.MAT
+% % % --------------------------------------------------------------------------------------------------
+% % placebo_Y = load( strcat('Y_placebo_seed_', num2str(placebo_seed)) );
+% % % USE Y_PLACEBO_SEED_1001 INSTEAD OF GW Y
+% % Y = placebo_Y.Y;
+% % % **************************************************************************************************
+% % disp(" Iter:" + num2str(iSim))
 
 %**************************************************************************
 % Output Space

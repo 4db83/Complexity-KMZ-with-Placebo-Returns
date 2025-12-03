@@ -25,10 +25,10 @@ make_combined_files       = 1; % set to one if not already combined.
 make_performance_measures = 1;
 
 % --------------------------------------------------------------------------------------------------
-% FIX THE Y PLACEBO DATA SEED FOR ALL SIMULATIONS AT ONE VALUE. 
+% PLACEBO DATA TO LOAD 
 % --------------------------------------------------------------------------------------------------
-% Use value larger than 1000, because w weights use 1:1000.
-placebo_seed = 1234;
+% placebo_seed = 1001;
+placebo_seed = 1111;
 
 % **************************************************************************************************
 % PATH to individual data files where the 1000 sims are stored from o1_RFF_predictions_main_KMZ

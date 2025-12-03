@@ -24,7 +24,9 @@ start_parpool_with
 % NUMBER OF SIMULATIONS: default is 1e3;
 nSim = 1e3;
 % Use value larger than 1000, so not to overlap with w weights RNDs 1:1000.
-placebo_seed = 1000 + 1;
+% placebo_seed = 1001;
+% placebo_seed = 1111;
+placebo_seed = 1234;
 
 %**************************************************************************
 % OUTPUT DIRECTORY NAME
@@ -54,20 +56,17 @@ stdize_Y = 1;
 for demean = [0 1]
   % RUN FIRST RFFs now 
   for trnwin = trnwin_list
-    % RUN RFF ridge regressions: this takes time
+    % FIRST: RUN RFF ridge regressions: this takes time
     file_list = file_names_to_get(OUTPUT_DIR, trnwin, stdize_Y, demean, nSim);
     nFiles = length(file_list);
-    fprintf(" \t No. to compute: %.5g/%.5g : \n", [nFiles nSim])
+    fprintf("Computing: %.5g/%.5g.\n", [nFiles nSim])
     sep('*')
-    parfor ( ii = 1:nFiles )
     % for ( ii = 1:nFiles )      
+    parfor ( ii = 1:nFiles )
       seed_randn = file_list(ii);
-      % fprintf( "Seed number: % .5g\n", seed_randn )
       KMZ_tryrff_v2_function_for_each_sim_placebo_Ret(gamma, trnwin, seed_randn, stdize_Y, demean, OUTPUT_DIR, Plist, lamlist, placebo_seed)
     end
-  end
-  % THEN RUN the Get GW benchmarks: this always uses lamlist = [0 10.^([-3:1:3])] and is quick 
-  for trnwin = trnwin_list
+    % SECOND: RUN the Get GW benchmarks: this always uses lamlist = [0 10.^([-3:1:3])] and is quick 
     KMZ_GW_benchmark_function_placebo_Ret(trnwin, stdize_Y, demean, OUTPUT_DIR, placebo_seed);
   end
 end
@@ -84,7 +83,7 @@ function list_of_seed_names = file_names_to_get(OUTPUT_DIR, trnwin, stdize_Y, de
 fsp = @(trnwin,stdize_Y,demean) ( strcat('maxP-12000-trnwin-', num2str(trnwin), ...
         '-gamma-2-stdize-', num2str(stdize_Y), '-demean-', num2str(demean), '-v2') );
 % string of file path
-save_path       = strcat( OUTPUT_DIR, fsp(trnwin,stdize_Y,demean) );
+save_path       = strcat( OUTPUT_DIR, fsp(trnwin,stdize_Y,demean), '.' );
 sep('*'); fprintf( save_path + " "); 
 files_tmp       = dir([save_path]);
 files_listed    = vertcat(char(files_tmp.name));
