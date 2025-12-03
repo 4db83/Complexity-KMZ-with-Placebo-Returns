@@ -52,7 +52,7 @@ gamma = 2;
 stdize_Y = 1;
 % DEMEANING = FALSE
 for demean = [0 1]
-  RUN FIRST RFFs now 
+  % RUN FIRST RFFs now 
   for trnwin = trnwin_list
     % RUN RFF ridge regressions: this takes time
     file_list = file_names_to_get(OUTPUT_DIR, trnwin, stdize_Y, demean, nSim);
