@@ -22,9 +22,13 @@ axLineWidth0 = get(gca,'LineWidth');
 SetDefaultValue(4, 'axLineWidth', axLineWidth0);
 SetDefaultValue(5, 'fig_handle' , gca);
 
+% --------------------------------------------------------------------------------------------------
+% UNCOMMENT BELOW IF YOU WANT BLACK LINES INSTEAD OF DARK GRAY FOR THE BOXES
+% --------------------------------------------------------------------------------------------------
 box_clr = 0.0*ones(1,3);
 set(gca,'YColor',box_clr);
 set(gca,'XColor',box_clr);
+
 set(gca,'LineWidth', axLineWidth);
 
 % get default ytick digits and Lables

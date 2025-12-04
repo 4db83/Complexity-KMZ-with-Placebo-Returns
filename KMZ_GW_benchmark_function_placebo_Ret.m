@@ -146,9 +146,36 @@ Yprd_gy     = Yprd;
 % save_path = './individual-files_stdize-0/';
 % if ~exist(save_path); mkdir(save_path); end
 
+GW_save_name = [save_path '/gybench-trnwin-' num2str(trnwin) '-stdize-' num2str(stdize)  '-demean-' num2str(demean) '.mat'];
 if saveon==1
-    save([save_path '/gybench-trnwin-' num2str(trnwin) '-stdize-' num2str(stdize)  '-demean-' num2str(demean) '.mat'],'timing_gy','Yprd_gy');
+    save(GW_save_name, 'timing_gy','Yprd_gy','Y');
 end
 % save_path
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

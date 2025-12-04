@@ -21,12 +21,24 @@ start_parpool_with
 % --------------------------------------------------------------------------------------------------
 % FIX THE Y PLACEBO DATA SEED FOR ALL SIMULATIONS AT ONE VALUE. 
 % --------------------------------------------------------------------------------------------------
-% NUMBER OF SIMULATIONS: default is 1e3;
-nSim = 1e3;
 % Use value larger than 1000, so not to overlap with w weights RNDs 1:1000.
 % placebo_seed = 1001;
 % placebo_seed = 1111;
-placebo_seed = 1234;
+% placebo_seed = 1234;
+kk = [95 18 33 35 34 72 8 22 21];
+for ii = 1:length(kk)
+placebo_seed = 1000 + kk(ii);
+% -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%       1      95       0.3844
+%       2      18       0.4121
+%       3      33       0.4351
+%       4      35       0.4661
+%       5      34       0.4900
+%       6      72       0.5182
+%       7       8       0.5484
+%       8      22       0.5798
+%       9      21       0.6129
+% -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------      
 
 %**************************************************************************
 % OUTPUT DIRECTORY NAME
@@ -40,7 +52,7 @@ OUTPUT_DIR      = set_dir( strcat( './_nsims_source_', RFF_output_name ) );
 %**************************************************************************
 % TRAINING WINDOW LIST
 % trnwin_list = [ 12 60 120 ];
-trnwin_list = [ 12 60 120 ];
+trnwin_list = [ 12 ];
 
 % define P and z grids
 Plist   = [2:2:20 24:12:(9*11) 10*(10:10:90) 1e3:1e3:3e3 4e3:2e3:12e3];
@@ -48,12 +60,14 @@ Plist   = [2:2:20 24:12:(9*11) 10*(10:10:90) 1e3:1e3:3e3 4e3:2e3:12e3];
 % orginal SHRINKAGE PARAMETERS LAMBDA (Z) 
 lamlist = 10.^(-3:1:3);
 
+% NUMBER OF SIMULATIONS: default is 1e3;
+nSim  = 1e3;
 % gamma in Random Fourier Features
 gamma = 2;
 % Standardization the dependent variable Y
 stdize_Y = 1;
 % DEMEANING = FALSE
-for demean = [0 1]
+for demean = [0]
   % RUN FIRST RFFs now 
   for trnwin = trnwin_list
     % FIRST: RUN RFF ridge regressions: this takes time
@@ -71,6 +85,8 @@ for demean = [0 1]
   end
 end
 
+
+end
 
 
 

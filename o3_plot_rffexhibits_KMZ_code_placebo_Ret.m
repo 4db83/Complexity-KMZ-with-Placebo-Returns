@@ -1,7 +1,10 @@
 clc; clear; tic;
 warning('off', 'MATLAB:print:FigureTooLargeForPage'); warning('off', 'MATLAB:unreachableCode'); %#ok 
 % --------------------------------------------------------------------------------------------------
-set(groot,'defaultAxesXTickLabelRotationMode','manual');set(groot,'defaultLineLineWidth',2);set(groot,'defaultAxesFontSize',14)% set(groot,'defaultAxesFontName','Times New Roman')
+set(groot,'defaultAxesXTickLabelRotationMode','manual');set(groot,'defaultLineLineWidth',2);
+set(groot,'defaultAxesFontSize',14); set(groot,'defaultAxesFontName','Times New Roman')
+% set(groot, 'defaultFigureColor', [0 0 0])% set(groot, 'defaultAxesColor',   .2*ones(1,3))% set(groot, 'defaultAxesXColor',  [1 1 1])
+% set(groot, 'defaultAxesYColor',  [1 1 1])% set(groot, 'defaultTextColor',   [1 1 1])% reset(groot)
 % PATH 2 TOOLBOX: WIN (\) AND MAC/UNIX (/) % addpath(genpath('./utility.Functions'))                   % local path to utility.Functions
 path_2_KMZ_local_functions = '../complexity KMZ - local.functions';
 if (exist( path_2_KMZ_local_functions, 'dir')==7)
@@ -21,15 +24,21 @@ disp(datetime('now'))
 PRNT_PDF  = 1;
 PRNT_XLS  = 1;
 PLOT_db   = 0;
+PLOT_KMZ  = 0;
 
-Monitor_Pos = 1;              % change to where plots need to be displayed
+Monitor_Pos = 3;              % change to where plots need to be displayed
+fig_bckgrn_clr = .5*ones(1,3); 
+set(groot, 'defaultAxesColor', 1.4*fig_bckgrn_clr)
 
 % --------------------------------------------------------------------------------------------------
-% FIX THE Y PLACEBO DATA SEED FOR ALL SIMULATIONS AT ONE VALUE. 
+% PLACEBO DATA TO LOAD 
 % --------------------------------------------------------------------------------------------------
-% Use value larger than 1000, because w weights use 1:1000.
-placebo_seed = 1001;
-placebo_seed = 1111;
+% placebo_seed = 1001;
+% placebo_seed = 1111;
+% placebo_seed = 1234;
+kk = [95 18 33 35 34 72 8 22 21];
+for ii = 1:length(kk)
+placebo_seed = 1000 + kk(ii);
 
 % **************************************************************************************************
 % PATH to individual data files where the 1000 sims are stored from o1_RFF_predictions_main_KMZ
@@ -42,10 +51,10 @@ OOS_EVAL_OUTPUT_DIR = set_dir( strcat( './_oos_eval_results_KMZ_', RFF_output_na
 
 % MAIN Looping through to get all the individual files for all Trnwin etd.
 stdize_Y  = 1;
-% for demean = [ 0 1 ]
+% for demean = [ 1 ]
 % for trnwin = [ 12 60 120 ]  
-demean = 0;
-trnwin = 12;
+for demean = 0
+for trnwin = 12
 
 % **************************************************************************************************
 % Choices of parameters
@@ -390,6 +399,10 @@ tbl_SNR_0     = array2table( Bnrmbar./(Vol0.^2),'VariableNames',zNames,'RowNames
 sep('=')
 fprintf('Finished reading single files and constructing portfolio measures ... \n'); sep('=')
 
+% Buy and hold SR over OOS period
+SR_Buy_Hold = sqrt(12)*mean(Y(trnwin+1:end))./std(Y(trnwin+1:end));
+fprintf('   SR(Buy&Hold)= %2.4f \n', SR_Buy_Hold )
+
 %% PLOTS ALL ------------------------------------------------------------------------------------ 
 
 Leg_all_pos = 3;
@@ -422,7 +435,7 @@ XlimUp = 50;
 LW  = 2.5; MK   = 'none';
 LW0 = 2.0; MK0  = 'none';
 LType = '-.'; xLbl = '$c$'; 
-DK = .7;
+DK = 1;
 SF = 15;
 SFb = -.24; % move subtitel 
 XLb = -.05; % move x-label
@@ -432,9 +445,10 @@ FNs = SF; clf;
 leg_FNTs = FNs-3;
 F1 = figure(1); clf; % F1.Color= .6*ones(1,3); %F1 = colordef(F1,'black') % FIG WITH DARK BACKGROUND
 monitors = get(0,'MonitorPositions'); F1.OuterPosition = monitors(Monitor_Pos,:);
-Figure_Title = ['Evaluation Measures. Tis = ' num2str(trnwin) '. OOS: ' dates_strng ...
-                ' (Stdize_Y=' num2str(stdize_Y) ', Demean =' num2str(demean) ')' ];
-set(F1,'Name',Figure_Title,'WindowState','maximized');
+% Figure_Title = ['Evaluation Measures. Tis = ' num2str(trnwin) '. OOS: ' dates_strng ...
+                % ' (Stdize_Y=' num2str(stdize_Y) ', Demean =' num2str(demean) ')' ];
+Figure_Title = "Placebo Seed = " + num2str(placebo_seed) + ". T =" + num2str(trnwin) + ", Demean = " + num2str(demean); 
+set(F1,'Name',Figure_Title,'WindowState','maximized','Color', fig_bckgrn_clr);
 
 tiledlayout(5,2,'TileSpacing', 'compact', 'Padding', 'loose');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -485,7 +499,7 @@ if PLOT_db
 end
 if c(pSR_kmz(1)) > vLTH1; xL1_kmz.LabelHorizontalAlignment = 'center';  end
 if c(pSR_kmz(1)) > vLTH2; xL1_kmz.LabelHorizontalAlignment = 'left';    end
-yline(max(maxSR_kmz,maxSR_0),'Color','m','LineWidth',.66,'LineStyle','-')
+yline(SR_Buy_Hold,'Color','m','LineWidth',.66,'LineStyle','-')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 nexttile(2) % ER (LINEAR Measure, some as ER0) KMZ don't scale/annualize E(R) by 12
@@ -520,7 +534,7 @@ xL2_0 = xline(c(pER_0),'Color', CLRS4Labels(zER_0,:),'LabelOrientation','horizon
 % adjust labeling position
 if c(pER_0(1))   > vLTH1;   xL2_0.LabelHorizontalAlignment = 'center';  end
 if c(pER_0(1))   > vLTH2;   xL2_0.LabelHorizontalAlignment = 'left';    end
-yline(max(maxER_kmz,maxER_0),'Color','m','LineWidth',.66,'LineStyle','-')
+% yline(max(maxER_kmz,maxER_0),'Color','m','LineWidth',.66,'LineStyle','-')
 % print2pdf('here')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -564,7 +578,7 @@ if PLOT_db
 end
 if c(pIR_kmz(1)) > vLTH1; xL3_kmz.LabelHorizontalAlignment = 'center';  end
 if c(pIR_kmz(1)) > vLTH2; xL3_kmz.LabelHorizontalAlignment = 'left';    end
-yline(max(maxIR_kmz,maxIR_0),'Color','m','LineWidth',.66,'LineStyle','-')
+% yline(max(maxIR_kmz,maxIR_0),'Color','m','LineWidth',.66,'LineStyle','-')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 nexttile(4) % alpha 
@@ -599,7 +613,7 @@ xL4_0 = xline(c(palpha_0),'Color', CLRS4Labels(zalpha_0,:),'LabelOrientation','h
 % adjust labeling position
 if c(palpha_0(1))   > vLTH1;   xL4_0.LabelHorizontalAlignment = 'center';  end
 if c(palpha_0(1))   > vLTH2;   xL4_0.LabelHorizontalAlignment = 'left';    end
-yline(max(maxalpha_kmz,maxalpha_0),'Color','m','LineWidth',.66,'LineStyle','-')
+% yline(max(maxalpha_kmz,maxalpha_0),'Color','m','LineWidth',.66,'LineStyle','-')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 nexttile(5) % R2 % Two axis
@@ -609,7 +623,7 @@ hold on;
   hVa_clrs = get(hVa, 'Color');
   setyticklabels([-4:1:3], 0, FNs); % ylim([-3 .35])
   hline(0)
-  yline(maxR2_kmz,'Color','m','LineWidth',.66,'LineStyle','-')
+  % yline(maxR2_kmz,'Color','m','LineWidth',.66,'LineStyle','-')
   if PLOT_db
 yyaxis right
   hV0 =  plot(c, tbl_R2_0.Variables, LType,'linewidth',LW0, 'Marker', MK0, 'Markersize', 9); 
@@ -619,7 +633,8 @@ yyaxis right
   for LL = 1:length(hVa_clrs); hV0(LL).Color = hVa_clrs{LL}*DK; end
   ax = gca; ax.YLim = [-.3 .11];
   % ylim([-.1 .02])  % R2ax = get(gca);  % R2_Ytkcs = R2ax.YTickLabel;
-  hline(0); yline(maxR2_0,'Color','m','LineWidth',.66,'LineStyle','-');
+  hline(0); 
+  % yline(maxR2_0,'Color','m','LineWidth',.66,'LineStyle','-');
 hold off;
   end
 box on; addgrid 
@@ -666,7 +681,9 @@ xlim([0-xos c(end)+xos])
 % ADD LEGEND
 % --------------------------------------------------------------------------------------------------
 % leg_name = [cellstr(strcat(strcat('$z=',num2str((lamlist)')),'$'));'$c=1$']; 
-leg_name = [cellstr(strcat('$',zNames,'$'))];
+zNames_legend = zNames; 
+zNames_legend = strrep(zNames_legend,'z=0.0001','z=0');
+leg_name = [cellstr(strcat('$',zNames_legend ,'$'))];
 if stdize_Y == 0
   lh  = addlegend([pp1], leg_name,3,FNs-3,[],2/3,[-0 -18]);
 else
@@ -715,7 +732,7 @@ if PLOT_db
 end
 if c(pIRt_kmz(1)) > vLTH1; xL5_kmz.LabelHorizontalAlignment = 'center';  end
 if c(pIRt_kmz(1)) > vLTH2; xL5_kmz.LabelHorizontalAlignment = 'left';    end
-yline(max(maxSR_kmz,maxSR_0),'Color','m','LineWidth',.66,'LineStyle','-')
+% yline(max(maxSR_kmz,maxSR_0),'Color','m','LineWidth',.66,'LineStyle','-')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 nexttile(8) % Volatility % KMZ don't scale/annualize vola by sqrt(12)
@@ -747,7 +764,7 @@ yyaxis right
   end  
 hold off;
 end
-set(gca,'FontName','Times New Roman','Fontsize',FNs,'YColor','k','XColor','k')
+set(gca,'FontName','Times New Roman','Fontsize',FNs); % ,'YColor','k','XColor','k')
 % set(gca,'YTickLabel',YTcklabs);
 hline(0)
 % xlabel(xLbl,'interpreter','latex')
@@ -773,7 +790,7 @@ if PRNT_PDF;  plot2pdf(pdf_name_eval_all); end
 % ---------------------------------------------------------------------------------------------
 
 %% PLOTS FOR SR ONLY 
-Leg_SR_pos = 5;
+Leg_SR_pos = 3;
 Leg_SR_col = 1;
 % Leg_all_buffer = [55 -15]; 
 % ---------------------------------------------------------------------------------------------
@@ -813,23 +830,23 @@ eval( strcat('maxPFM_0 = max',    PFM,'_0;'  ) );
 
 F2 = figure(2); clf; % F1.Color= .6*ones(1,3); %F1 = colordef(F1,'black') % FIG WITH DARK BACKGROUND
 monitors = get(0,'MonitorPositions'); F2.OuterPosition = monitors(Monitor_Pos,:);
-Figure_Title_2 = ['Sharpe Ratio (' PFM '). Tis = ' num2str(trnwin) '. OOS: ' dates_strng ... 
-                  ' (Stdize_Y=' num2str(stdize_Y) ', Demean =' num2str(demean) ')' ];
-set(F2,'Name',Figure_Title_2,'WindowState','maximized');
+Figure_Title_2 = "Placebo Seed = " + num2str(placebo_seed) + ". T =" + num2str(trnwin) + ", Demean = " + num2str(demean);
+set(F2,'Name',Figure_Title_2,'WindowState','maximized','Color', fig_bckgrn_clr );
 
 hold on;
   pla = plot(c, tbl_PFM_kmz.Variables ,  '- ','linewidth',LW , 'Marker', MK , 'Markersize', 9);  
   set(pla, {'Color'}, clr_palette);
   hVa_clrs = get(pla, 'Color');
-  if ~(strcmp(PFM,'ER') || strcmp(PFM,'alpha'))
-    pl0 = plot(c, tbl_PFM_0.Variables   , LType,'linewidth',LW0, 'Marker', MK0, 'Markersize', 9);  
-    set(pl0, {'Color'}, clr_palette);
-    % FIX COLOR ORDER to be the same, just a bit darker in the dashed line plots
-    for LL = 1:length(hVa_clrs); pl0(LL).Color = hVa_clrs{LL}*DK; end
-  end
+  % if ~(strcmp(PFM,'ER') || strcmp(PFM,'alpha'))
+  %   pl0 = plot(c, tbl_PFM_0.Variables   , LType,'linewidth',LW0, 'Marker', MK0, 'Markersize', 9);  
+  %   set(pl0, {'Color'}, clr_palette);
+  %   % FIX COLOR ORDER to be the same, just a bit darker in the dashed line plots
+  %   for LL = 1:length(hVa_clrs); pl0(LL).Color = hVa_clrs{LL}*DK; end
+  % end
 hold off;
 
-setplotdims([.10 1/5 .82 .77], 3/4); 
+% setplotdims([.10 1/5 .82 .77], 3/4); 
+setplotdims([.10 2/3 .82 .17], 3/4); 
 xlabel(xLbl,'interpreter','latex')
 % leg_name = [cellstr(strcat(strcat('$z=',num2str((lamlist)')),'$'));'$c=1$'];  
 % leg_name = strrep(leg_name,'0.6000000000000001','0.6');
@@ -848,7 +865,8 @@ set(gca,'TickLength',[0.02 0.02])
 xl = xline(1,'Color', .5*ones(1,3),'LineWidth',2/3,'LineStyle','--');
 xl.Alpha = 1;  % Set alpha to 1 (fully opaque)
 % xl = xline(8);
-yline(maxPFM_0,'Color','m','LineWidth',.66,'LineStyle','-')
+% Line at SR of Buy and hold
+yline(SR_Buy_Hold,'Color','m','LineWidth',.66,'LineStyle','-')
 
 % ADD A VERTICAL LINE AT MAX (SR) of correct strategy
 decml_fmt   = "%.3g"; 
@@ -857,27 +875,27 @@ label_name2 = "[$c=" + num2str(c(pPFM_0), decml_fmt ) + ",~" + tbl_SR_0(pPFM_0,z
 label_name  = label_name1 + "~" + label_name2;
 
 % max position of labels
-PSt = max(ylim)*osw;
-if c(pPFM_0) < 8 
-  xLa = xline( c(pPFM_0), 'Color', big_CLRS(zPFM_0,:)*DK,'LabelOrientation','horizontal','Alpha',1, ...% 'HandleVisibility', 'off', ...
-  'Label', label_name1, 'LabelHorizontalAlignment','right','LineWidth',1.5,'Interpreter','latex','FontSize',FNs-2);
-  text(c(pPFM_0)+.15, PSt, 0, label_name2 , 'Color', big_CLRS(zPFM_0,:)*DK, 'Interpreter','latex','FontSize',FNs-3)
-  % text(c(pPFM_0)+.15, xLa.Parent.Position(2)-.035, 0, label_name2 , 'Color', big_CLRS(zPFM_0,:)*DK, 'Interpreter','latex','FontSize',FNs-3)
-else
-  xLa = xline( c(pPFM_0), 'Color', big_CLRS(zPFM_0,:)*DK,'LabelOrientation','horizontal','Alpha',1, ...% 'HandleVisibility', 'off', ...
-  'Label', label_name1, 'LabelHorizontalAlignment', 'left','LineWidth',1.5,'Interpreter','latex','FontSize',FNs-2);
-  text(c(pPFM_0)-3.85, PSt, 0, label_name2 , 'Color', big_CLRS(zPFM_0,:)*DK, 'Interpreter','latex','FontSize',FNs-3)
-  % text(c(pPFM_0)-3.03, xLa.Parent.Position(2)-.035, 0, label_name2 , 'Color', big_CLRS(zPFM_0,:)*DK, 'Interpreter','latex','FontSize',FNs-3)
-end
+% PSt = max(ylim)*osw;
+% if c(pPFM_0) < 8 
+%   xLa = xline( c(pPFM_0), 'Color', big_CLRS(zPFM_0,:)*DK,'LabelOrientation','horizontal','Alpha',1, ...% 'HandleVisibility', 'off', ...
+%   'Label', label_name1, 'LabelHorizontalAlignment','right','LineWidth',1.5,'Interpreter','latex','FontSize',FNs-2);
+%   text(c(pPFM_0)+.15, PSt, 0, label_name2 , 'Color', big_CLRS(zPFM_0,:)*DK, 'Interpreter','latex','FontSize',FNs-3)
+%   % text(c(pPFM_0)+.15, xLa.Parent.Position(2)-.035, 0, label_name2 , 'Color', big_CLRS(zPFM_0,:)*DK, 'Interpreter','latex','FontSize',FNs-3)
+% else
+%   xLa = xline( c(pPFM_0), 'Color', big_CLRS(zPFM_0,:)*DK,'LabelOrientation','horizontal','Alpha',1, ...% 'HandleVisibility', 'off', ...
+%   'Label', label_name1, 'LabelHorizontalAlignment', 'left','LineWidth',1.5,'Interpreter','latex','FontSize',FNs-2);
+%   text(c(pPFM_0)-3.85, PSt, 0, label_name2 , 'Color', big_CLRS(zPFM_0,:)*DK, 'Interpreter','latex','FontSize',FNs-3)
+%   % text(c(pPFM_0)-3.03, xLa.Parent.Position(2)-.035, 0, label_name2 , 'Color', big_CLRS(zPFM_0,:)*DK, 'Interpreter','latex','FontSize',FNs-3)
+% end
 tickshrink(.2);
 
 % YLINE AT MAXSR DO NOT PLOT IT HERE 
 % PSt = xLa.Parent.Position(2)+.007;
-if (trnwin == 12 && demean == 0)
-  text(3, PSt,        0, label_name1 , 'Color', big_CLRS(zPFM_0,:)*DK, 'Interpreter','latex','FontSize',FNs-3)
-  text(3, PSt -.035,  0, label_name2 , 'Color', big_CLRS(zPFM_0,:)*DK, 'Interpreter','latex','FontSize',FNs-3)
-  % text(3, PSt*osw,  0, label_name2 , 'Color', big_CLRS(zPFM_0,:)*DK, 'Interpreter','latex','FontSize',FNs-3)
-end
+% if (trnwin == 12 && demean == 0)
+%   text(3, PSt,        0, label_name1 , 'Color', big_CLRS(zPFM_0,:)*DK, 'Interpreter','latex','FontSize',FNs-3)
+%   text(3, PSt -.035,  0, label_name2 , 'Color', big_CLRS(zPFM_0,:)*DK, 'Interpreter','latex','FontSize',FNs-3)
+%   % text(3, PSt*osw,  0, label_name2 , 'Color', big_CLRS(zPFM_0,:)*DK, 'Interpreter','latex','FontSize',FNs-3)
+% end
 % subtitle('SR'); % title('SR','FontWeight','normal')
 % L0 = line(1*ones(1,2),[-1e9,1e9],'Linewidth',1,'LineStyle','-','color','k'); %'HandleVisibility', 'off');
 
@@ -924,6 +942,7 @@ pdf_name_PFM = strcat(OOS_EVAL_OUTPUT_DIR, NAME_SUFFIX, '_', PFM, 's');
 if PRNT_PDF;  plot2pdf(pdf_name_PFM); end
 % tickshrink(.1)
 % **************************************************************************************************  
+
 
 
 %% Generate Table 1: Comparison with Welch and Goyal (2008) and mkt
@@ -1009,16 +1028,16 @@ sep
 
 % MAKE ONE BIG STATS OUTPUT FILE COMARING THE AGGREGATION OUTPUT [~,nC,nZ]  = size(mean_timing);
 rowNan = NaN(1,2*nL+3); colNan = NaN(nP,1);
-P_allout = [ [NaN(1,2) lamlist NaN lamlist];    rowNan;
-  [ Plist' c sqrt(12)*SR colNan sqrt(12)*SR0];  rowNan;
-  [ Plist' c sqrt(12)*IR colNan sqrt(12)*IR0];  rowNan;
-  [ Plist' c alpha       colNan alpha0];        rowNan;
-  [ Plist' c IR_tstat    colNan IR0_tstat];     rowNan;
-  [ Plist' c R2          colNan R20];           rowNan;
-  [ Plist' c ER          colNan ER0];           rowNan;
-  [ Plist' c Vol         colNan Vol0];          rowNan;
-  [ Plist' c Bias        colNan Bias0];         rowNan;
-  [ Plist' c MSE         colNan MSE0];          rowNan;
+P_allout = [  % [NaN(1,2) lamlist NaN lamlist];               rowNan;
+              [ Plist' c tbl_SR_kmz.Variables    colNan tbl_SR_0.Variables    ]; rowNan;
+              [ Plist' c tbl_IR_kmz.Variables    colNan tbl_IR_0.Variables    ]; rowNan;
+              [ Plist' c tbl_alpha_kmz.Variables colNan tbl_alpha_0.Variables ]; rowNan;
+              [ Plist' c tbl_IRt_kmz.Variables   colNan tbl_IRt_0.Variables   ]; rowNan;
+              [ Plist' c tbl_R2_kmz.Variables    colNan tbl_R2_0.Variables    ]; rowNan;
+              [ Plist' c tbl_ER_kmz.Variables    colNan tbl_ER_0.Variables    ]; rowNan;
+              [ Plist' c tbl_Vol_kmz.Variables   colNan tbl_Vol_0.Variables   ]; rowNan;
+              [ Plist' c tbl_Bias_kmz.Variables  colNan tbl_Bias_0.Variables  ]; rowNan;
+              [ Plist' c tbl_MSE_kmz.Variables   colNan tbl_MSE_0.Variables   ]; rowNan;
   ];
 
 % PRINT TO EXCEL
@@ -1037,10 +1056,11 @@ if PRNT_XLS == 1
 
   % which columns to put the lables in the excel file
   Col_KMZ = number2excel_column(2+4);
-  Col_0   = number2excel_column(nL+1+2+4); 
+  Col_0   = number2excel_column(nL+1+2+4);
+  Col_z   = number2excel_column(nL+1+2+1);
 
   % PRINT BIG STATS TO EXCEL
-  writematrix(P_allout,           xlsoutName,'Range','A1');
+  writematrix(P_allout,           xlsoutName,'Range','A3');
   writematrix('SR(KMZ)',          xlsoutName,'Range',Col_KMZ + num2str(0*(nP+1)+2) );
   writematrix('IR(KMZ)',          xlsoutName,'Range',Col_KMZ + num2str(1*(nP+1)+2) );
   writematrix('Alpha(KMZ)',       xlsoutName,'Range',Col_KMZ + num2str(2*(nP+1)+2) );
@@ -1052,7 +1072,9 @@ if PRNT_XLS == 1
   writematrix('MSE(KMZ)',         xlsoutName,'Range',Col_KMZ + num2str(8*(nP+1)+2) );
 
   writematrix('P',                xlsoutName,'Range','A2');
-  writematrix('z',                xlsoutName,'Range','B1');
+  xlswrite(xlsoutName,cellstr(prntstrng2xls(zNames_legend)'),'Sheet1','C1');
+  xlswrite(xlsoutName,cellstr(prntstrng2xls(zNames_legend)'),'Sheet1', Col_z + num2str(1));
+  % writematrix('z',                xlsoutName,'Range','B1');
   writematrix('c',                xlsoutName,'Range','B2');
   writematrix('SR',               xlsoutName,'Range',Col_0 + num2str(0*(nP+1)+2) );
   writematrix('IR',               xlsoutName,'Range',Col_0 + num2str(1*(nP+1)+2) );
@@ -1068,18 +1090,83 @@ if PRNT_XLS == 1
 end
 
 diary off
-
-
+ 
  
 % -----------------------------------------------------------------------------------------------
 % loop though all files up to here
+end; end
 
-% end; end
+
+end 
+
 
 fprintf(" ALL DONE \n")
 
+
+
 %% Extra stuff
-% **************************************************************************************************
+% % **************************************************************************************************
+% % Buy and Hold SR over the out-of-sample period from simulated data
+% clc
+% sharpe_sim = sqrt(12)*mean(Y)./std(Y);
+% sharpe_pop = sqrt(12)*iSim1_all.mu_Y./iSim1_all.std_Y;
+% disp(" SR(sim): " + num2str(sharpe_sim))
+% disp(" SR(pop): " + num2str(sharpe_pop))
+% 
+% % plot simulated series in fits from RFF
+% figure(3);
+% tiledlayout(3,1)
+% 
+% Pi = 34;
+% zi = 7;
+% disp("RFF(P=" + num2str(Plist(Pi)) + ",z=" + num2str(lamlist(zi)) + ")" )  
+% nexttile
+% hold on
+% plot(Yprd_gy(120+1:end,[1 2]))
+% plot(Y(120+1:end));
+% plot(mean_Yprd(:,Pi,zi))
+% hline; addgrid
+% ylim([-5 5])
+% 
+% 
+% 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

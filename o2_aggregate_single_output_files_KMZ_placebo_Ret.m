@@ -21,14 +21,18 @@ start_parpool_with
 % SET TO 1 TO DELETE THEM IF STORAGE IS AN ISSUE
 DELETE_INDIVIDUAL_FILES   = 0;
 % --------------------------------------------------------------------------------------------------
-make_combined_files       = 1; % set to one if not already combined. 
+make_combined_files       = 0; % set to one if not already combined. 
 make_performance_measures = 1;
 
 % --------------------------------------------------------------------------------------------------
 % PLACEBO DATA TO LOAD 
 % --------------------------------------------------------------------------------------------------
 % placebo_seed = 1001;
-placebo_seed = 1111;
+% placebo_seed = 1111;
+placebo_seed = 1234;
+% kk = [95 18 33 35 34 72 8 22 21];
+% for ii = 1:length(kk)
+% placebo_seed = 1000 + kk(ii);
 
 % **************************************************************************************************
 % PATH to individual data files where the 1000 sims are stored from o1_RFF_predictions_main_KMZ
@@ -41,10 +45,10 @@ GW_OUTPUT_DIR = NSIMS_SOURCE;
 
 % MAIN Looping through to get all the individual files for all Trnwin etd.
 stdize_Y  = 1;
-for demean = [0 1]
+for demean = [ 1 ]
 for trnwin = [ 12 60 120 ]  
 % for demean = 0
-% for trnwin = 120 
+% for trnwin = [12] 
 
 %**************************************************************************
 % Choices of parameters
@@ -330,7 +334,7 @@ fprintf(' Finished reading single files and constructing portfolio measues... \n
 % diary off
 
 
-
+% end
 
 
 
