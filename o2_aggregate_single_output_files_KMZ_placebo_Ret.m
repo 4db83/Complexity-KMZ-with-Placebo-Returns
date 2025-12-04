@@ -19,20 +19,24 @@ disp(datetime('now'))
 start_parpool_with
 % --------------------------------------------------------------------------------------------------
 % SET TO 1 TO DELETE THEM IF STORAGE IS AN ISSUE
-DELETE_INDIVIDUAL_FILES   = 0;
+DELETE_INDIVIDUAL_FILES   = 1;
 % --------------------------------------------------------------------------------------------------
-make_combined_files       = 0; % set to one if not already combined. 
+make_combined_files       = 1; % set to one if not already combined. 
 make_performance_measures = 1;
 
 % --------------------------------------------------------------------------------------------------
-% PLACEBO DATA TO LOAD 
+% FIX THE Y PLACEBO DATA SEED FOR ALL SIMULATIONS AT ONE VALUE. 
 % --------------------------------------------------------------------------------------------------
-% placebo_seed = 1001;
-% placebo_seed = 1111;
-placebo_seed = 1234;
-% kk = [95 18 33 35 34 72 8 22 21];
-% for ii = 1:length(kk)
-% placebo_seed = 1000 + kk(ii);
+% Use value larger than 1000, so not to overlap with w weights RNDs 1:1000.
+% seed_set = [1001 1111 1234 1184 1792];                      % random
+% seed_set = [1677 1661 1857 1909 1598 1961 1709 1376];       % largest SR
+% seed_set = [1095 1018 1033 1035 1034 1072 1008 1022 1021];  % percentiles 10% to 90%
+seed_set = [1017 1043 1044 1048 1057 1072 1073 1077 1078 1083 1085 1088 1123 1124 1128 1135 1142 1146 1149 1155 1168 1171 1176 1181 1190 1198 1223 1228 1233 1236 1242 1244 1257 1258 1261 1270 1274 1279 1294 1300 1317 1318 1321 1323 1333 1351 1360 1369 1372 1377 1380 1394 1407 1423 1433 1441 1453 1464 1475 1484 1491 1525 1533 1559 1573 1586 1594 1602 1608 1623 1628 1630 1631 1634 1656 1657 1664 1665 1678 1692 1701 1722 1728 1736 1737 1741 1747 1753 1791 1793 1797 1818 1823 1835 1841 1847 1850 1853 1855 1876]; 
+
+for ii = 1:length(seed_set)
+placebo_seed = seed_set(ii);
+% -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 % **************************************************************************************************
 % PATH to individual data files where the 1000 sims are stored from o1_RFF_predictions_main_KMZ
@@ -45,10 +49,10 @@ GW_OUTPUT_DIR = NSIMS_SOURCE;
 
 % MAIN Looping through to get all the individual files for all Trnwin etd.
 stdize_Y  = 1;
-for demean = [ 1 ]
-for trnwin = [ 12 60 120 ]  
-% for demean = 0
-% for trnwin = [12] 
+% for demean = [ 0 1 ]
+% for trnwin = [ 12 60 120 ]  
+for demean = 0
+for trnwin = 12 
 
 %**************************************************************************
 % Choices of parameters
@@ -164,14 +168,16 @@ timing = Yprd.*Y';
 % --------------------------------------------------------------------------------------------------
 % DELETE INDIVIDUAL FILES (ONLY IF NEEDED FOR SPACE REASONS)
 % --------------------------------------------------------------------------------------------------
-% if DELETE_INDIVIDUAL_FILES == 1
-%   if length(files_listing) > 1
-%     for s = 2:nSim % keep the first iSim1.mat;
-%       filename = strcat(NSIMS_SOURCE, para_str , '/', files_listing(s).name);
-%       delete(filename);
-%     end
-%   end
-% end
+if DELETE_INDIVIDUAL_FILES == 1
+   disp("Deleting Sim Files")
+  if length(files_listing) > 1
+    for s = 2:nSim % keep the first iSim1.mat;
+      filename = strcat(NSIMS_SOURCE, para_str , '/', files_listing(s).name);
+      delete(filename);
+%      disp("Deleting" + filename)
+    end
+  end
+end
 % --------------------------------------------------------------------------------------------------
 
 % PERCENTILE LIST
@@ -325,16 +331,14 @@ else
 end
 
 % loop though all files up to here
-end
-end
+end; end
 
 fprintf(' Finished reading single files and constructing portfolio measues... \n')
 
 % % CLOSE THE LOG FILE FOR READING THE INDIVIDUAL FILES
 % diary off
 
-
-% end
+end
 
 
 

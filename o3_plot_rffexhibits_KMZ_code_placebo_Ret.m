@@ -3,8 +3,7 @@ warning('off', 'MATLAB:print:FigureTooLargeForPage'); warning('off', 'MATLAB:unr
 % --------------------------------------------------------------------------------------------------
 set(groot,'defaultAxesXTickLabelRotationMode','manual');set(groot,'defaultLineLineWidth',2);
 set(groot,'defaultAxesFontSize',14); set(groot,'defaultAxesFontName','Times New Roman')
-% set(groot, 'defaultFigureColor', [0 0 0])% set(groot, 'defaultAxesColor',   .2*ones(1,3))% set(groot, 'defaultAxesXColor',  [1 1 1])
-% set(groot, 'defaultAxesYColor',  [1 1 1])% set(groot, 'defaultTextColor',   [1 1 1])% reset(groot)
+% reset(groot)
 % PATH 2 TOOLBOX: WIN (\) AND MAC/UNIX (/) % addpath(genpath('./utility.Functions'))                   % local path to utility.Functions
 path_2_KMZ_local_functions = '../complexity KMZ - local.functions';
 if (exist( path_2_KMZ_local_functions, 'dir')==7)
@@ -26,19 +25,23 @@ PRNT_XLS  = 1;
 PLOT_db   = 0;
 PLOT_KMZ  = 0;
 
-Monitor_Pos = 3;              % change to where plots need to be displayed
+Monitor_Pos = 1;              % change to where plots need to be displayed
 fig_bckgrn_clr = .5*ones(1,3); 
 set(groot, 'defaultAxesColor', 1.4*fig_bckgrn_clr)
 
 % --------------------------------------------------------------------------------------------------
-% PLACEBO DATA TO LOAD 
+% FIX THE Y PLACEBO DATA SEED FOR ALL SIMULATIONS AT ONE VALUE. 
 % --------------------------------------------------------------------------------------------------
-% placebo_seed = 1001;
-% placebo_seed = 1111;
-% placebo_seed = 1234;
-kk = [95 18 33 35 34 72 8 22 21];
-for ii = 1:length(kk)
-placebo_seed = 1000 + kk(ii);
+% Use value larger than 1000, so not to overlap with w weights RNDs 1:1000.
+% seed_set = [1001 1111 1234 1184 1792];                      % random
+% seed_set = [1677 1661 1857 1909 1598 1961 1709 1376];       % largest SR
+% seed_set = [1095 1018 1033 1035 1034 1072 1008 1022 1021];  % percentiles 10% to 90%
+seed_set = [1017 1043 1044 1048 1057 1072 1073 1077 1078 1083 1085 1088 1123 1124 1128 1135 1142 1146 1149 1155 1168 1171 1176 1181 1190 1198 1223 1228 1233 1236 1242 1244 1257 1258 1261 1270 1274 1279 1294 1300 1317 1318 1321 1323 1333 1351 1360 1369 1372 1377 1380 1394 1407 1423 1433 1441 1453 1464 1475 1484 1491 1525 1533 1559 1573 1586 1594 1602 1608 1623 1628 1630 1631 1634 1656 1657 1664 1665 1678 1692 1701 1722 1728 1736 1737 1741 1747 1753 1791 1793 1797 1818 1823 1835 1841 1847 1850 1853 1855 1876]; 
+
+for ii = 1:length(seed_set)
+placebo_seed = seed_set(ii);
+% -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 % **************************************************************************************************
 % PATH to individual data files where the 1000 sims are stored from o1_RFF_predictions_main_KMZ
